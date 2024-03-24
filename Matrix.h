@@ -1,46 +1,229 @@
-#include <iostream>
 #include <iomanip>
+#include <iostream>
 #include <vector>
 
 template<typename T>
 class Matrix {
 public:
-    Matrix();                                      // Конструктор пустой матрицы
-    Matrix(size_t rows, size_t cols);              // Конструктор матрицы заданных размеров
-    Matrix(const std::vector<std::vector<T>>& v);  // Конструктор матрицы из вектора векторов
-    Matrix(const Matrix<T>& other);                // Конструктор копирования
+    Matrix() : rows(0), cols(0) { // Конструктор пустой матрицы
+    }
 
-    Matrix<T>& operator=(const Matrix<T>& other);  // Оператор присваивания
+    Matrix(std::size_t rows, std::size_t cols)
+            : cols(cols), rows(rows) { // Конструктор матрицы заданных размеров
+        data.resize(rows);
+        for (std::size_t i = 0; i < rows; ++i) {
+            data[i].resize(cols);
+        }
+    }
 
-    T& operator()(size_t i, size_t j);              // Доступ к элементу (i, j)
-    const T& operator()(size_t i, size_t j) const;  // Доступ к элементу (i, j) для константной матрицы
+    Matrix(const std::vector<std::vector<T>> &v) { // Конструктор матрицы из вектора векторов
+        data = v;
+        rows = v.size();
+        if (rows != 0) {
+            cols = v[0].size();
+        } else {
+            cols = 0;
+        }
+        for (std::size_t i = 0; i < v.size(); i++) {
+            if (cols != v[i].size()) {
+                throw std::runtime_error("ошибка");
+            }
+        }
+    }
 
-    size_t get_rows() const;  // Получение количества строк
-    size_t get_cols() const;  // Получение количества столбцов
+    Matrix(const Matrix<T> &other) : data(other.data), cols(other.cols), rows(other.rows) { // Конструктор копирования
+    }
 
-    bool operator==(const Matrix<T>& other) const;  // Сравнение матриц
-    bool operator!=(const Matrix<T>& other) const;  // Сравнение матриц
+    Matrix<T> &operator=(const Matrix<T> &other) { // Оператор присваивания
+        data = other.data;
+        rows = other.rows;
+        cols = other.cols;
+        return *this;
+    }
 
-    Matrix<T> operator*(const T& x) const;              // Умножение матрицы на элемент
-    Matrix<T> operator+(const Matrix<T>& other) const;  // Сложение матриц
-    Matrix<T> operator-(const Matrix<T>& other) const;  // Вычитание матриц
-    Matrix<T> operator-() const;                        // Отрицание матрицы
-    Matrix<T> operator*(const Matrix<T>& other) const;  // Умножение матриц
+    T &operator()(std::size_t i, std::size_t j) { // Доступ к элементу (i, j)
+        if (i >= rows || j >= cols) {
+            throw std::runtime_error("ошибка");
+        }
+        return data[i][j];
+    }
 
-    Matrix<T> transpose() const;  // Транспонирование матрицы
+    const T &operator()(std::size_t i, std::size_t j)
+    const { // Доступ к элементу (i, j) для константной матрицы
+        if (i >= rows || j >= cols) {
+            throw std::runtime_error("ошибка");
+        }
+        return data[i][j];
+    }
 
-    // Получение подматрицы, начиная с позиции (row, col) и размерами (rows, cols)
-    Matrix<T> submatrix(size_t row, size_t col, size_t rows, size_t cols) const;
+    size_t get_rows() const { // Получение количества строк
+        return rows;
+    }
 
-    static Matrix<T> eye(size_t n);                    // Создание единичной матрицы
-    static Matrix<T> zeros(size_t rows, size_t cols);  // Создание нулевой матрицы
+    size_t get_cols() const { // Получение количества столбцов
+        return cols;
+    }
 
-    Matrix<T> horizontal_concatenate(const Matrix<T>& other) const;  // Конкатенация матриц по горизонтали
-    Matrix<T> vertical_concatenate(const Matrix<T>& other) const;    // Конкатенация матриц по вертикали
+    bool operator==(const Matrix<T>& other) const { //Сравнение матриц
+        if (rows != other.get_rows() || cols != other.get_cols()) {
+            return false;
+        }
+        for (std::size_t i = 0; i < rows; ++i) {
+            for (std::size_t j = 0; j < cols; ++j) {
+                if (static_cast<T>(data[i][j]) != static_cast<T>(other(i, j))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    bool operator!=(const Matrix<T> &other) const { // Сравнение матриц
+        return !(*this == other);
+    }
+
+    Matrix<T> operator*(const T &x) const { // Умножение матрицы на элемент
+        Matrix<T> mult_const(rows, cols);
+        for (std::size_t i = 0; i < rows; ++i) {
+            for (std::size_t j = 0; j < cols; j++) {
+                mult_const.data[i][j] = data[i][j] * x;
+            }
+        }
+        return mult_const;
+    }
+
+    Matrix<T> operator+(const Matrix<T> &other) const { // Сложение матриц
+        if (rows != other.rows || cols != other.cols) {
+            throw std::runtime_error("ошибка");
+        }
+        Matrix<T> sum(rows, cols);
+        for (std::size_t i = 0; i < rows; ++i) {
+            for (std::size_t j = 0; j < cols; ++j) {
+                sum.data[i][j] = data[i][j] + other.data[i][j];
+            }
+        }
+        return sum;
+    }
+
+    Matrix<T> operator-(const Matrix<T> &other) const { // Вычитание матриц
+        if (rows != other.rows || cols != other.cols) {
+            throw std::runtime_error("ошибка");
+        }
+        Matrix<T> sub(rows, cols);
+        for (std::size_t i = 0; i < rows; ++i) {
+            for (std::size_t j = 0; j < cols; ++j) {
+                sub.data[i][j] = data[i][j] - other.data[i][j];
+            }
+        }
+        return sub;
+    }
+
+    Matrix<T> operator-() const { // Отрицание матрицы
+        Matrix<T> negation(rows, cols);
+        for (std::size_t i = 0; i < rows; ++i) {
+            for (std::size_t j = 0; j < cols; ++j) {
+                negation.data[i][j] = data[i][j] * (-1);
+            }
+        }
+        return negation;
+    }
+
+
+    Matrix<T> operator*(const Matrix<T> &other) const { // Умножение матриц
+        if (cols != other.rows) {
+            throw std::runtime_error("ошибка");
+        }
+        Matrix<T> mult(rows, other.cols);
+        for (std::size_t i = 0; i < rows; ++i) {
+            for (std::size_t j = 0; j < other.cols; ++j) {
+                for (std::size_t k = 0; k < cols; k++) {
+                    mult.data[i][j] += data[i][k] * other.data[k][j];
+                }
+            }
+        }
+        return mult;
+    }
+
+    Matrix<T> transpose() const { // Транспонирование матрицы
+        Matrix<T> transp(cols, rows);
+        for (std::size_t i = 0; i < rows; ++i) {
+            for (std::size_t j = 0; j < cols; ++j) {
+                transp.data[j][i] = data[i][j];
+            }
+        }
+        return transp;
+    }
+
+    // Получение подматрицы, начиная с позиции (row, col) и размерами (rows,  cols)
+    Matrix<T> submatrix(std::size_t row, std::size_t col, std::size_t rows, std::size_t cols) const {
+        if (row + rows > this->rows || col + cols > this->cols) {
+            throw std::runtime_error("ошибка");
+        }
+
+        Matrix<T> sub(rows, cols);
+        for (std::size_t i = 0; i < rows; i++) {
+            for (std::size_t j = 0; j < cols; j++) {
+                sub.data[i][j] = data[i + row][j + col];
+            }
+        }
+
+        return sub;
+    }
+
+    static Matrix<T> eye(std::size_t n) { // Создание единичной матрицы
+        Matrix<T> single(n, n);
+        for (std::size_t i = 0; i < n; i++) {
+            single.data[i][i] = 1;
+        }
+        return single;
+    }
+
+    static Matrix<T> zeros(std::size_t rows,
+                           std::size_t cols) { // Создание нулевой матрицы
+        return Matrix<T>(rows, cols);
+    }
+
+    Matrix<T> horizontal_concatenate(
+            const Matrix<T> &other) const { // Конкатенация матриц по горизонтали
+        if (rows == other.rows) {
+            throw std::runtime_error("ошибка");
+        }
+        Matrix<T> hor_conc(rows, cols + other.cols);
+        for (std::size_t i = 0; i < rows; i++) {
+            for (std::size_t j = 0; j < cols + other.cols; j++) {
+                if (j < cols) {
+                    hor_conc.data[i][j] = data[i][j];
+                } else {
+                    hor_conc.data[i][j] = other.data[i][j - cols];
+                }
+            }
+        }
+
+        return hor_conc;
+    }
+
+    Matrix<T> vertical_concatenate(
+            const Matrix<T> &other) const { // Конкатенация матриц по вертикали
+        if (cols != other.cols) {
+            throw std::runtime_error("ошибка");
+        }
+        Matrix<T> vert_conc(rows + other.rows, cols);
+        for (std::size_t i = 0; i < rows + other.rows; i++) {
+            for (std::size_t j = 0; j < cols; j++) {
+                if (i < rows) {
+                    vert_conc.data[i][j] = data[i][j];
+                } else {
+                    vert_conc.data[i][j] = other.data[i - rows][j];
+                }
+            }
+        }
+        return vert_conc;
+    }
 
     // «Красивый» вывод матрицы
-    template <typename Tstream>
-    friend std::ostream &operator<<(std::ostream &out, const Matrix<Tstream>& m);
+    template<typename Tstream>
+    friend std::ostream &operator<<(std::ostream &out, const Matrix<Tstream> &m);
+
 
 private:
     size_t rows;                      // количество строк
@@ -48,8 +231,8 @@ private:
     std::vector<std::vector<T>> data; // данные матрицы
 };
 
-template <typename Tstream>
-std::ostream &operator<<(std::ostream &out, const Matrix<Tstream>& m) {
+template<typename Tstream>
+std::ostream &operator<<(std::ostream &out, const Matrix<Tstream> &m) {
     const int MAX_NUM_DIGITS = 5;
     out << std::endl;
     for (int i = 0; i < m.rows; ++i) {
