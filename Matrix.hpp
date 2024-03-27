@@ -185,7 +185,7 @@ public:
 
     Matrix<T> horizontal_concatenate(
             const Matrix<T> &other) const { // Конкатенация матриц по горизонтали
-        if (rows == other.rows) {
+        if (rows != other.rows) {
             throw std::runtime_error("ошибка");
         }
         Matrix<T> hor_conc(rows, cols + other.cols);
