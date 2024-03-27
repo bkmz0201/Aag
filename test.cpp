@@ -1,6 +1,6 @@
 
 
-#include "Matrix.h"
+#include "Matrix.hpp"
 
 int main() {
     // Создание матрицы 3x3 и заполнение ее значениями
