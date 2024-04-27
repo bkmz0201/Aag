@@ -1,3 +1,4 @@
+#pragma once
 #include <iomanip>
 #include <iostream>
 #include <vector>
@@ -237,7 +238,7 @@ std::ostream &operator<<(std::ostream &out, const Matrix<Tstream> &m) {
     out << std::endl;
     for (int i = 0; i < m.rows; ++i) {
         for (int j = 0; j < m.cols; ++j) {
-            out << std::setw(MAX_NUM_DIGITS) << m(i, j).val() << " ";
+            out << std::setw(MAX_NUM_DIGITS) << m(i, j) << " ";
         }
         out << std::endl;
     }

@@ -1,3 +1,6 @@
+#pragma once
+#include <iostream>
+
 template<int p>
 class Fp {
 public:
@@ -38,12 +41,10 @@ public:
 
     // Операция деления
     Fp<p> operator/(const Fp<p>& other) const{
-        int inverse = inversed(other.value, p);
-        if (inverse == -1) {
-            return Fp<p>();
-        }
+        if(other.value == 0)
+            return 0;
+        int inverse = inversed(other, p);
         return Fp<p>((value * inverse) % p);
-
     }
 
     // Операция смены знака
@@ -71,14 +72,11 @@ public:
 
     // Операция /= (деление с присваиванием)
     Fp<p>& operator/=(const Fp<p>& other){
-        int inverse = inversed(other.value, p);
-        if (inverse != -1) {
-            value = (value * inverse) % p;
-        } else {
-            value = 0;
-        }
+        if(other.value == 0)
+            return 0;
+        int inverse = inversed(other, p);
+        value = (value * inverse) % p;
         return *this;
-
     }
 
 
@@ -92,36 +90,24 @@ public:
         return value != other.value;
     }
 
+    // Вывод элемента
+    template <int Tstream>
+    friend std::ostream &operator<<(std::ostream &out, const Fp<Tstream>& el);
+
 private:
     int value; // Значение элемента поля
 
+    int inversed(const Fp<p>& b, int m) const {
 
-    // Функция для нахождения обратного элемента
-    // Данная функция основывается на алгоритме Евклида а так же на коэфицентах безу
-    // По тождеству Безу мы емеем bx + my = НОД(b, m), затем мы добиваемся чтобы НОД был равен 1,
-    // то есть мы делаем преобраования до тех пор пока числа не станут взаимно простыми.
-    // Тогда как раз таки x будет являтся обратным элементом b по модулу m
-    int inversed(int b, int m) const {
-        //переменные для хранения промезжуточных значений
-        int m0 = m;
-        int y = 0, x = 1;
-
-        if (m == 1)
-            return 0;
-
-        while (b > 1) {
-            int q = b / m;
-            int t = m;
-            m = b % m;
-            b = t;
-            t = y;
-            y = x - q * y;
-            x = t;
+        for(int x = 0; x < m; ++x) {
+            if ((b * x).val() == 1)
+                return x;
         }
-        // Проверка на отрицательное значение обратного элемента
-        if (x < 0)
-            x += m0;
-
-        return x;
     }
 };
+
+template <int Tstream>
+std::ostream &operator<<(std::ostream &out, const Fp<Tstream>& el) {
+    out << el.val();
+    return out;
+}

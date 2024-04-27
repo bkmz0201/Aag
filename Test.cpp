@@ -1,12 +1,20 @@
+#pragma once
 #include "HammingCode.hpp"
 
 
 int main() {
-    HammingCode<2>  L(3);
-    Matrix<Fp<2>> sub = L.sub();
-    L.Print();
-    std::cout << "The result of multiplication:" << std::endl;
+    freopen("output.txt", "w", stdout);
+    HammingCode<3>  L(3);
+    Matrix<Fp<3>> H_matrix = L.get_H();
+    Matrix<Fp<3>> G_matrix = L.get_G();
+    std::cout << H_matrix << std::endl;
+    std::cout << G_matrix << std::endl;
+    Matrix<Fp<3>> sub = G_matrix * H_matrix.transpose();
     std::cout << sub << std::endl;
+    Fp<3> a = 9;
+    Fp<3> b = 8;
+    std::cout << a << '\n' << b << '\n' << a / b << '\n' << a + b << '\n' << a - b << std::endl;
+
 
 
     // Создание матрицы 3x3 и заполнение ее значениями
