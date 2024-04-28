@@ -4,12 +4,12 @@
 
 int main() {
     freopen("output.txt", "w", stdout);
-    HammingCode<3>  L(3);
-    Matrix<Fp<3>> H_matrix = L.get_H();
-    Matrix<Fp<3>> G_matrix = L.get_G();
+    HammingCode<5>  L(5);
+    Matrix<Fp<5>> H_matrix = L.get_H();
+    Matrix<Fp<5>> G_matrix = L.get_G();
     std::cout << H_matrix << std::endl;
     std::cout << G_matrix << std::endl;
-    Matrix<Fp<3>> sub = G_matrix * H_matrix.transpose();
+    Matrix<Fp<5>> sub = G_matrix * H_matrix.transpose();
     std::cout << sub << std::endl;
     Fp<3> a = 9;
     Fp<3> b = 8;

@@ -48,14 +48,14 @@ private:
                 for(size_t j = 0; j < m; ++j){
                     if(A_data[one_arg][j] != 0){
                         if(j == 0 || check_first == 1){
-                            if(A_data[one_arg][j] * A_data[i][j] != 0){
+                            if(A_data[one_arg][j] / A_data[i][j] != 0){
                                 fl++;
-                                del = A_data[one_arg][j] * A_data[i][j];
+                                del = A_data[one_arg][j] / A_data[i][j];
                             }
                             check_first = 0;
                         }
                         else{
-                            if(A_data[one_arg][j] * A_data[i][j] == del)
+                            if(A_data[one_arg][j] / A_data[i][j] == del)
                                 fl++;
                         }
                     }
@@ -98,7 +98,6 @@ private:
         }
 
         Matrix<Fp<p>> A = Matrix<Fp<p>>(A_data);
-
         k = A.get_rows();
         Matrix<Fp<p>> one_matrix_g = Matrix<Fp<p>>::eye(k);
         G = one_matrix_g.horizontal_concatenate(-A);
