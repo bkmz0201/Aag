@@ -3,18 +3,42 @@
 
 
 int main() {
+
     freopen("output.txt", "w", stdout);
-    HammingCode<5>  L(5);
-    Matrix<Fp<5>> H_matrix = L.get_H();
-    Matrix<Fp<5>> G_matrix = L.get_G();
+    HammingCode<3>  L(3);
+    Fp<5> random_num(14);
+    Fp<5> rr = random_num.random();
+    std::cout << rr << std::endl;
+    Matrix<Fp<3>> H_matrix = L.get_H();
+    Matrix<Fp<3>> G_matrix = L.get_G();
     std::cout << H_matrix << std::endl;
     std::cout << G_matrix << std::endl;
-    Matrix<Fp<5>> sub = G_matrix * H_matrix.transpose();
+    Matrix<Fp<3>> sub = G_matrix * H_matrix.transpose();
     std::cout << sub << std::endl;
     Fp<3> a = 9;
     Fp<3> b = 8;
     std::cout << a << '\n' << b << '\n' << a / b << '\n' << a + b << '\n' << a - b << std::endl;
-
+    Matrix<Fp<3>> data(1, G_matrix.get_rows());
+    for(size_t i = 0; i < data.get_cols(); i++){
+        data(0, i) = rand();
+    }
+    std::cout << "data:" << std::endl;
+    std::cout << data << std::endl;
+    Matrix<Fp<3>> codeword = L.encode(data);
+    std::cout << "codeword:" << std::endl;
+    std::cout << codeword << std::endl;
+    Matrix<Fp<3>> decode_word = L.decode(codeword);
+    std::cout << "decode:" << std::endl;
+    std::cout << decode_word << std::endl;
+    Matrix<Fp<3>> error_word = L.add_error(codeword);
+    std::cout << "error_word:" << std::endl;
+    std::cout << error_word << std::endl;
+    Matrix<Fp<3>> syndrom = L.sybrom(error_word);
+    std::cout << "syndrom:" << std::endl;
+    std::cout << syndrom << std::endl;
+    Matrix<Fp<3>> decode_error_word = L.decode(error_word);
+    std::cout << "decode_error_word:" << std::endl;
+    std::cout << decode_error_word << std::endl;
 
 
     // Создание матрицы 3x3 и заполнение ее значениями
